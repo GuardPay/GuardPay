@@ -206,6 +206,28 @@
         .pin-modal-content button:hover {
             background-color: #e60000;
         }
+        .notification-container {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 300px;
+            z-index: 1003;
+        }
+        .notification {
+            background-color: #ffffff;
+            color: #ff2f2f;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateX(100%);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
         @media (max-width: 600px) {
             .button {
                 width: 90%;
@@ -303,6 +325,8 @@
         </div>
     </div>
 
+    <div class="notification-container" id="notificationContainer"></div>
+
     <script>
         let messages = ["Carregando...", "Iniciando...", "Criptografado..."];
         let currentMessageIndex = 0;
@@ -338,7 +362,7 @@
         }
 
         function navigateTo(section) {
-            alert(`Navegando para ${section}.`);
+            addNotification(`Navegando para ${section}.`);
             // Implementar navegação real aqui
         }
 
@@ -403,7 +427,7 @@
             themeSetup.style.backgroundColor = `rgba(${hexToRgb(color)}, 0.9)`;
             buttonSetup.style.backgroundColor = `rgba(${hexToRgb(color)}, 0.9)`;
             localStorage.setItem('theme', theme);
-            alert(`Tema ${theme} selecionado.`);
+            addNotification(`Tema ${theme} selecionado.`);
         }
 
         function setLoadingScreenColor(bgColor, textColor) {
@@ -454,7 +478,7 @@
                 button.style.color = buttonTextColor;
             });
             localStorage.setItem('buttonTheme', theme);
-            alert(`Tema do botão ${theme} selecionado.`);
+            addNotification(`Tema do botão ${theme} selecionado.`);
         }
 
         function applySavedButtonTheme() {
@@ -478,16 +502,16 @@
             const pin2 = document.getElementById('pin2').value;
             if (pin1 === pin2 && pin1 !== '') {
                 localStorage.setItem('pin', pin1);
-                alert('PIN salvo com sucesso.');
+                addNotification('PIN salvo com sucesso.');
                 closePinSetup();
             } else {
-                alert('Os PINs não coincidem ou estão vazios.');
+                addNotification('Os PINs não coincidem ou estão vazios.');
             }
         }
 
         function setPinFrequency(frequency) {
             localStorage.setItem('pinFrequency', frequency);
-            alert(`Frequência de solicitação de PIN configurada para: ${frequency}`);
+            addNotification(`Frequência de solicitação de PIN configurada para: ${frequency}`);
         }
 
         function checkPinPrompt() {
@@ -536,12 +560,32 @@
             const savedPin = localStorage.getItem('pin');
 
             if (enteredPin === savedPin) {
-                alert('PIN correto! Acesso concedido.');
+                addNotification('PIN correto! Acesso concedido.');
                 hidePinModal();
             } else {
-                alert('PIN incorreto! Tente novamente.');
+                addNotification('PIN incorreto! Tente novamente.');
                 userPinInput.value = '';
             }
+        }
+
+        function addNotification(message) {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerText = message;
+
+            container.appendChild(notification);
+
+            // Mostra a notificação com animação
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+
+            // Remove a notificação após 3 segundos
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => container.removeChild(notification), 500);
+            }, 3000);
         }
 
         function hexToRgb(hex) {
