@@ -362,8 +362,22 @@
         }
 
         function navigateTo(section) {
-            addNotification(`Navegando para ${section}.`);
-            // Implementar navegação real aqui
+            let message;
+            switch(section) {
+                case 'email':
+                    message = 'Navegando para Registro De E-mail.';
+                    break;
+                case 'document':
+                    message = 'Navegando para Registro de Documento.';
+                    break;
+                case 'password':
+                    message = 'Navegando para Registros de Senhas.';
+                    break;
+                case 'expenses':
+                    window.location.href = 'https://guardpay.github.io/Controle-de-Gastos/';
+                    return; // Sai da função após redirecionar
+            }
+            addNotification(message);
         }
 
         function toggleSettingsMenu() {
