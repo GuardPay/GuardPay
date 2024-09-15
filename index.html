@@ -146,7 +146,7 @@
             background-color: #ff2f2f;
             color: #ffffff;
         }
-        .pin-setup input, .pin-modal input {
+        .pin-setup input, .pin-modal input, .auth-modal input {
             margin: 10px;
             padding: 10px;
             font-size: 1em;
@@ -156,7 +156,7 @@
             max-width: 300px;
             transition: box-shadow 0.2s;
         }
-        .pin-setup input:focus, .pin-modal input:focus {
+        .pin-setup input:focus, .pin-modal input:focus, .auth-modal input:focus {
             box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
         }
         .close-button {
@@ -173,7 +173,7 @@
         .close-button:hover {
             transform: scale(1.1);
         }
-        .pin-modal {
+        .pin-modal, .auth-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -185,7 +185,7 @@
             justify-content: center;
             align-items: center;
         }
-        .pin-modal-content {
+        .pin-modal-content, .auth-modal-content {
             background-color: #ffffff;
             padding: 20px;
             border-radius: 10px;
@@ -193,7 +193,7 @@
             text-align: center;
             color: #ff2f2f;
         }
-        .pin-modal-content button {
+        .pin-modal-content button, .auth-modal-content button {
             margin-top: 10px;
             padding: 10px 20px;
             background-color: #ff2f2f;
@@ -203,7 +203,7 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
-        .pin-modal-content button:hover {
+        .pin-modal-content button:hover, .auth-modal-content button:hover {
             background-color: #e60000;
         }
         .notification-container {
@@ -325,6 +325,15 @@
         </div>
     </div>
 
+    <div class="auth-modal" id="authModal">
+        <div class="auth-modal-content">
+            <h2>Autorização Necessária</h2>
+            <input type="text" id="cpfInput" placeholder="Digite seu CPF">
+            <input type="date" id="dobInput" placeholder="Data de Nascimento">
+            <button onclick="validateAuth()">Entrar</button>
+        </div>
+    </div>
+
     <div class="notification-container" id="notificationContainer"></div>
 
     <script>
@@ -362,22 +371,42 @@
         }
 
         function navigateTo(section) {
-            let message;
-            switch(section) {
-                case 'email':
-                    message = 'Navegando para Registro De E-mail.';
-                    break;
-                case 'document':
-                    message = 'Navegando para Registro de Documento.';
-                    break;
-                case 'password':
-                    message = 'Navegando para Registros de Senhas.';
-                    break;
-                case 'expenses':
-                    window.location.href = 'https://guardpay.github.io/Controle-de-Gastos/';
-                    return; // Sai da função após redirecionar
+            if (section === 'expenses') {
+                showAuthModal();
+            } else {
+                let message;
+                switch(section) {
+                    case 'email':
+                        message = 'Navegando para Registro De E-mail.';
+                        break;
+                    case 'document':
+                        message = 'Navegando para Registro de Documento.';
+                        break;
+                    case 'password':
+                        message = 'Navegando para Registros de Senhas.';
+                        break;
+                }
+                addNotification(message);
             }
-            addNotification(message);
+        }
+
+        function showAuthModal() {
+            document.getElementById('authModal').style.display = 'flex';
+        }
+
+        function validateAuth() {
+            const cpf = document.getElementById('cpfInput').value;
+            const dob = document.getElementById('dobInput').value;
+            const validCpf = '09246376331';
+            const validDob = '2003-07-21'; // Formato de data padrão ISO (ano-mês-dia)
+
+            if (cpf === validCpf && dob === validDob) {
+                addNotification('Acesso concedido. Redirecionando...');
+                document.getElementById('authModal').style.display = 'none';
+                window.location.href = 'https://guardpay.github.io/Controle-de-Gastos/';
+            } else {
+                addNotification('Você não tem autorização para acessar.');
+            }
         }
 
         function toggleSettingsMenu() {
